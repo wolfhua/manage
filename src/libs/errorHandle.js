@@ -1,3 +1,4 @@
+import store from '@/store/index'
 const addErrorLog = errorInfo => {
   const { statusText, status, request: { responseURL } } = errorInfo
   const info = {

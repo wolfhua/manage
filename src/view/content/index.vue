@@ -8,7 +8,8 @@
         search-place="top"
         v-model="tableData"
         :columns="columns"
-        @on-delete="handleDelete"
+        @on-row-edit="handleEdit"
+        @on-row-remove="handleRemove"
       />
       <Row
         type="flex"
@@ -16,31 +17,45 @@
         align="middle"
         class="code-row-bg"
       >
-        <Button style="margin: 10px 0" type="primary" @click="exportExcel"
-          >导出为Excel文件</Button
-        >
-        <Page
-          :current="page"
-          :total="total"
-          :page-size-opts="pageArr"
-          show-sizer
-          show-elevator
-          @on-change="changePage"
-          @on-page-size-change="changePageSize"
-        />
+        <Col class="ctrls">
+          <Button @click="handleSelectAll(true)">设置全选</Button>
+          <Button @click="handleSelectAll(false)">取消全选</Button>
+          <Button style="margin: 10px 0" type="primary" @click="exportExcel">
+            <Icon type="md-download"></Icon>导出为Csv文件
+          </Button>
+        </Col>
+        <Col>
+          <Page
+            :current="page"
+            :total="total"
+            :page-size-opts="pageArr"
+            show-sizer
+            show-elevator
+            @on-change="changePage"
+            @on-page-size-change="changePageSize"
+          />
+        </Col>
       </Row>
     </Card>
+    <editModal
+      :isShow="showEdit"
+      :itemData="itemData"
+      @editEvent="handleEditEvent"
+      @changeEvent="handleChangeEvent"
+    ></editModal>
   </div>
 </template>
 
 <script>
 import Tables from '_c/tables'
-import { getList } from '@/api/content'
+import { getList, deletePostByid, updatePostByid } from '@/api/content'
 import dayjs from 'dayjs'
+import editModal from './editModal.vue'
 export default {
   name: 'content_management',
   components: {
-    Tables
+    Tables,
+    editModal
   },
   data () {
     return {
@@ -51,6 +66,7 @@ export default {
       columns: [
         {
           type: 'selection',
+          key: 'handle',
           width: 60,
           align: 'center',
           hidden: true
@@ -87,7 +103,17 @@ export default {
           align: 'center',
           // 方法二：使用 render 方法结构化数据
           render: (h, params) => {
-            return h('div', [h('span', params.row.uid.nickname)])
+            return h('div', [
+              h('Tag', {
+                class: 'test',
+                props: {
+                  color: 'primary'
+                },
+                domProps: {
+                  innerHTML: params.row.uid.nickname
+                }
+              })
+            ])
           },
           search: {
             type: 'input'
@@ -243,23 +269,66 @@ export default {
         {
           title: '设置',
           key: 'settings',
-          slot: 'action',
+          slot: 'action', // 与table组件里的slot-scope slot名称相同
           fixed: 'right',
           width: 160,
           align: 'center',
           hidden: true
         }
       ],
-      tableData: []
+      tableData: [],
+      showEdit: false,
+      currentIndex: 0,
+      itemData: {}
     }
   },
   methods: {
-    handleDelete (params) {
-      console.log(params)
+    // 全选/取消全选
+    handleSelectAll (status) {
+      this.$refs.selection.selectAll(status)
+    },
+    // 改变模态框状态
+    handleChangeEvent (value) {
+      this.showEdit = value
+      this.$Message.info('取消编辑！')
+    },
+    // 编辑
+    handleEdit (row, index) {
+      this.showEdit = true
+      this.currentIndex = index
+      // 拷贝传递给子组件
+      this.itemData = { ...row }
+    },
+    // 删除
+    handleRemove (row, index) {
+      console.log(row)
+      console.log(index)
+      this.$Modal.confirm({
+        title: '想好了真的要删除吗？',
+        content: `您确认要删除第${index + 1}条，标题为"${row.title}"的数据吗？`,
+        onOk: () => {
+          deletePostByid(row._id).then(res => {
+            if (res.code === 200) {
+              // filter过滤数组内容
+              this.tableData = this.tableData.filter(item => {
+                return item._id !== row._id
+              })
+              this.$Message.info('删除成功')
+            } else {
+              this.$Message.error(res.msg)
+            }
+          }).catch(err => {
+            this.$Message.error('删除失败：' + err)
+          })
+        },
+        onCancel: () => {
+          this.$Message.info('您取消了删除操作')
+        }
+      })
     },
     exportExcel () {
       this.$refs.tables.exportCsv({
-        filename: `table-${(new Date()).valueOf()}.csv`
+        filename: `article-${(new Date()).valueOf()}.csv`
       })
     },
     // 改变页码
@@ -272,6 +341,7 @@ export default {
       this.limit = size
       this.getTabList()
     },
+    // 获取列表数据
     getTabList () {
       getList({
         page: this.page - 1,
@@ -282,6 +352,18 @@ export default {
           this.total = res.total
         }
       })
+    },
+    // 编辑数据保存触发
+    handleEditEvent (item) {
+      updatePostByid(item).then(res => {
+        if (res.code === 200) {
+          // 替换列表数据中指定行的值
+          // this.tableData[this.currentIndex] = item // 注：这种方式替换数据，dom节点数据不会更新
+          this.tableData.splice(this.currentIndex, 1, item)
+          console.log('成功')
+        }
+      })
+      this.showEdit = false
     }
   },
   mounted () {
@@ -290,5 +372,10 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+.ctrls {
+  button {
+    margin-right: 10px;
+  }
+}
 </style>
