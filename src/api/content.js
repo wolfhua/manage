@@ -5,7 +5,7 @@ import qs from 'qs'
  * @param {Object} options 参数
  */
 const getList = (options) => {
-  return axios.get('/public/list?' + qs.stringify(options))
+  return axios.get('/public/list-admin?' + qs.stringify(options))
 }
 // 根据帖子id删除
 const deletePostByid = (id) => {

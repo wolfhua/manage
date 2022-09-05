@@ -10,6 +10,7 @@
         :columns="columns"
         @on-row-edit="handleEdit"
         @on-row-remove="handleRemove"
+        @searchEvent="handleSearchData"
       />
       <Row
         type="flex"
@@ -18,8 +19,8 @@
         class="code-row-bg"
       >
         <Col class="ctrls">
-          <Button @click="handleSelectAll(true)">设置全选</Button>
-          <Button @click="handleSelectAll(false)">取消全选</Button>
+          <!-- <Button @click="handleSelectAll(true)">设置全选</Button>
+          <Button @click="handleSelectAll(false)">取消全选</Button> -->
           <Button style="margin: 10px 0" type="primary" @click="exportExcel">
             <Icon type="md-download"></Icon>导出为Csv文件
           </Button>
@@ -62,6 +63,7 @@ export default {
       page: 1,
       limit: 10,
       total: 0,
+      option: {},
       pageArr: [10, 20, 30, 50, 100],
       columns: [
         {
@@ -283,10 +285,6 @@ export default {
     }
   },
   methods: {
-    // 全选/取消全选
-    handleSelectAll (status) {
-      this.$refs.selection.selectAll(status)
-    },
     // 改变模态框状态
     handleChangeEvent (value) {
       this.showEdit = value
@@ -345,7 +343,8 @@ export default {
     getTabList () {
       getList({
         page: this.page - 1,
-        limit: this.limit
+        limit: this.limit,
+        ...this.option
       }).then(res => {
         if (res.code === 200) {
           this.tableData = res.data
@@ -364,6 +363,24 @@ export default {
         }
       })
       this.showEdit = false
+    },
+    // 搜索
+    handleSearchData (value) {
+      // 判断是否有新的查询内容的传递，把分页数据归0
+      this.option = {}
+      this.page = 1
+      // if (
+      //   (typeof this.option.search !== 'undefined' &&
+      //     value.search !== this.option.search) ||
+      //   this.option === {}
+      // ) {
+      //   this.page = 1 // 从1开始
+      // }
+      if (value.item === 'tags') {
+        value.item = 'tag'
+      }
+      this.option[value.item] = value.search
+      this.getTabList()
     }
   },
   mounted () {

@@ -4,24 +4,29 @@
       v-if="searchable && searchPlace === 'top'"
       class="search-con search-con-top"
     >
-      <Select v-model="searchKey" class="search-col">
-        <Option
-          v-for="item in columns"
-          :value="item.key"
-          :key="`search-col-${item.key}`"
-        >
-          <template v-if="item.key !== 'handle'">
-            {{ item.title }}</template
-          ></Option
-        >
+      <Select class="search-col" @on-select="handleSelect">
+        <template v-for="(item, index) in columns">
+          <Option
+            :value="index"
+            :key="`search-col-${item.key}`"
+            v-if="!item.hidden"
+          >
+            {{ item.title }}
+          </Option>
+        </template>
       </Select>
-      <Input
+      <Search
+        :value="searchValue"
+        :item="chooseItem"
+        @changeEvent="handleSearchInput"
+      ></Search>
+      <!-- <Input
         @on-change="handleClear"
         clearable
         placeholder="输入关键字搜索"
         class="search-input"
         v-model="searchValue"
-      />
+      /> -->
       <Button @click="handleSearch" class="search-btn" type="primary">
         <Icon type="md-search" />&nbsp;&nbsp;搜索
       </Button>
@@ -100,10 +105,14 @@
 
 <script>
 import TablesEdit from './edit.vue'
+import Search from './search.vue'
 import handleBtns from './handle-btns'
 import './index.less'
 export default {
   name: 'Tables',
+  components: {
+    Search
+  },
   props: {
     value: {
       type: Array,
@@ -192,6 +201,7 @@ export default {
    */
   data () {
     return {
+      chooseItem: {},
       insideColumns: [],
       insideTableData: [],
       edittingCellId: '',
@@ -201,6 +211,14 @@ export default {
     }
   },
   methods: {
+    handleSelect (index) {
+      const idx = index.value
+      this.chooseItem = this.columns[idx].search
+      this.searchKey = this.columns[idx].key
+      this.searchValue = ['select', 'date'].includes(this.chooseItem.type)
+        ? []
+        : ''
+    },
     suportEdit (item, index) {
       item.render = (h, params) => {
         return h(TablesEdit, {
@@ -270,13 +288,21 @@ export default {
             ? this.columns[1].key
             : ''
     },
-    handleClear (e) {
-      if (e.target.value === '') this.insideTableData = this.value
-    },
     handleSearch () {
-      this.insideTableData = this.value.filter(
-        (item) => item[this.searchKey].indexOf(this.searchValue) > -1
-      )
+      // this.insideTableData = this.value.filter(
+      //   (item) => item[this.searchKey].indexOf(this.searchValue) > -1
+      // )
+      this.$emit('searchEvent', {
+        item: this.searchKey,
+        search: this.searchValue
+      })
+    },
+    handleSearchInput (item) {
+      if (this.chooseItem.type === 'input') {
+        this.searchValue = item.target.value // 取得Input组件中的数据
+      } else {
+        this.searchValue = item
+      }
     },
     handleTableData () {
       this.insideTableData = this.value.map((item, index) => {
@@ -335,7 +361,7 @@ export default {
     },
     value (val) {
       this.handleTableData()
-      if (this.searchable) this.handleSearch()
+      // if (this.searchable) this.handleSearch()
     }
   },
   mounted () {

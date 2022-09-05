@@ -11,6 +11,7 @@
         @on-row-edit="handleEdit"
         @on-row-remove="handleRemove"
         @on-selection-change="handleSelect"
+        @searchEvent="handleSearchData"
       >
         <template v-slot:table-header>
           <Button @click="handleAddUser" class="search-btn" type="primary">
@@ -83,6 +84,7 @@ export default {
       page: 1,
       limit: 10,
       total: 0,
+      option: {},
       pageArr: [10, 20, 30, 50, 100],
       columns: [
         {
@@ -334,11 +336,24 @@ export default {
       this.limit = size
       this.getTabList()
     },
+    handleSearchData (value) {
+      // 判断是否有新的查询内容的传递，把分页数据归0
+      if (
+        (typeof this.option.search !== 'undefined' &&
+          value.search !== this.option.search) ||
+        this.option === {}
+      ) {
+        this.page = 1 // 从1开始
+      }
+      this.option = value
+      this.getTabList()
+    },
     // 获取列表数据
     getTabList () {
       getUserList({
         page: this.page - 1,
-        limit: this.limit
+        limit: this.limit,
+        option: this.option
       }).then(res => {
         if (res.code === 200) {
           this.tableData = res.data
@@ -348,7 +363,6 @@ export default {
     },
     // 编辑数据保存触发
     handleEditEvent (item) {
-      console.warn(item)
       updateUserById(item).then(res => {
         if (res.code === 200) {
           this.tableData.splice(this.currentIndex, 1, item)
