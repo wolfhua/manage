@@ -397,3 +397,13 @@ export const setTitle = (routeItem, vm) => {
   const resTitle = pageTitle ? `${title} - ${pageTitle}` : title
   window.document.title = resTitle
 }
+
+/**
+ * 数组根据指定key排序
+ * @param {*} arr 排序数组
+ * @param {*} property 指定字段
+ * @returns
+ */
+export const sortObj = (arr, property) => {
+  return arr.sort((m, n) => m[property] - n[property])
+}
