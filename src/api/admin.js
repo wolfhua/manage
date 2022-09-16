@@ -18,6 +18,14 @@ const checkUsername = (data) => axios.get('/admin/checkname?' + qs.stringify(dat
 const addUser = (data) => axios.post('/admin/add-user', data)
 // 批量更新用户
 const updateUserBatchById = (data) => axios.post('/admin/update-user-settings', data)
+// 添加菜单
+const addMenu = (data) => axios.post('/admin/add-menu', data)
+// 删除菜单
+const deleteMenu = (data) => axios.post('/admin/delete-menu', data)
+// 修改菜单
+const updateMenu = (data) => axios.post('/admin/update-menu', data)
+// 查询菜单
+const getMenu = () => axios.get('/admin/get-menu')
 
 export {
   getUserList,
@@ -25,5 +33,9 @@ export {
   deleteUserById,
   checkUsername,
   addUser,
-  updateUserBatchById
+  updateUserBatchById,
+  addMenu,
+  deleteMenu,
+  updateMenu,
+  getMenu
 }

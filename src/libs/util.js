@@ -407,3 +407,105 @@ export const setTitle = (routeItem, vm) => {
 export const sortObj = (arr, property) => {
   return arr.sort((m, n) => m[property] - n[property])
 }
+
+// 删除节点
+export const deleteNode = (tree, node) => {
+  for (let i = 0; i < tree.length; i++) {
+    const currentNode = tree[i]
+    if (currentNode.nodeKey === node.nodeKey) {
+      tree.splice(i, 1)
+      return tree
+    } else {
+      if (currentNode.children && currentNode.children.length > 0) {
+        // 递归执行
+        deleteNode(currentNode.children, node)
+      }
+    }
+  }
+  return tree
+}
+
+// 插入节点
+export const insertNode = (parent, select, data) => {
+  for (let i = 0; i < parent.length; i++) {
+    const item = parent[i]
+    // 去重
+    if (item.nodeKey === select.nodeKey) {
+      // 排序
+      parent.push(data)
+      parent = sortObj(parent, 'sort')
+      return parent
+    } else {
+      if (item.children && item.children.length > 0) {
+        // 递归执行
+        insertNode(item.children, select, data)
+      }
+    }
+  }
+  return parent
+}
+
+// 编辑节点
+export const updateNode = (tree, node) => {
+  for (let i = 0; i < tree.length; i++) {
+    const currentNode = tree[i]
+    // 去重
+    if (currentNode.nodeKey === node.nodeKey) {
+      // tree[i] = node 这样修改，页面不会刷新
+      tree.splice(i, 1, node)
+      return tree
+    } else {
+      if (currentNode.children && currentNode.children.length > 0) {
+        // 递归执行
+        updateNode(currentNode.children, node)
+      }
+    }
+  }
+  return tree
+}
+
+export const deleteKey = (node, property) => {
+  if (node.children && node.children.length > 0) {
+    node.children.forEach(item => {
+      delete item[property]
+      // if (item.children && item.children.length > 0) {
+      //   deleteKey(item.children, property)
+      // }
+      deleteKey(item, property)
+    })
+  }
+  return node
+}
+
+// 获取节点的父级节点（最终返回一级节点）
+export const getNode = (arr, node) => {
+  for (let i = 0; i < arr.length; i++) {
+    const currentNode = arr[i]
+    // 当前循环中是否有该节点
+    if (currentNode.nodeKey === node.nodeKey) {
+      if (!currentNode.parent) {
+        // 删除子节点上的parent属性
+        deleteKey(currentNode, 'parent')
+        return currentNode
+      } else {
+        // console.log(currentNode.title)
+        return true
+      }
+    } else {
+      // 判断子节点是否有该节点
+      if (currentNode.children && currentNode.children.length > 0) {
+        // 如果有子节点，将当前节点作为父节点赋值给每一个子节点
+        currentNode.children.map(o => {
+          o.parent = currentNode
+        })
+        // console.log(currentNode.title + '----')
+        if (getNode(currentNode.children, node)) {
+          // console.log(currentNode.title)
+          // 删除子节点上的parent属性
+          deleteKey(currentNode, 'parent')
+          return currentNode
+        }
+      }
+    }
+  }
+}

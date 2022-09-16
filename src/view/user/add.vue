@@ -213,7 +213,7 @@ export default {
         if (valid) {
           this.loading = false
           this.$emit('changeEvent', false)
-          this.$emit('editEvent', this.localItem)
+          this.$emit('editEvent', { ...this.localItem })
           setTimeout(() => {
             this.$refs.table.resetFields()
           }, 0)
