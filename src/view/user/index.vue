@@ -48,16 +48,19 @@
     <editModal
       :isShow="showEdit"
       :item="itemData"
+      :roles="roles"
       @editEvent="handleEditEvent"
       @changeEvent="handleChangeEvent"
     ></editModal>
     <AddModel
       :isShow="showAdd"
+      :roles="roles"
       @editEvent="handleItemAdd"
       @changeEvent="handleAddChangeEvent"
     ></AddModel>
     <BatchSet
       :isShow="showSet"
+      :roles="roles"
       @editEvent="handleItemSet"
       @changeEvent="handleSetChangeEvent"
     ></BatchSet>
@@ -69,7 +72,7 @@ import Tables from '_c/tables'
 import editModal from './editModal'
 import AddModel from './add'
 import BatchSet from './batchSet'
-import { getUserList, updateUserById, deleteUserById, addUser, updateUserBatchById } from '@/api/admin'
+import { getUserList, updateUserById, deleteUserById, addUser, getRoleNames, updateUserBatchById } from '@/api/admin'
 import dayjs from 'dayjs'
 export default {
   name: 'user_management',
@@ -85,6 +88,7 @@ export default {
       limit: 10,
       total: 0,
       option: {},
+      roles: [],
       pageArr: [10, 20, 30, 50, 100],
       columns: [
         {
@@ -119,8 +123,11 @@ export default {
             //   .map((o) => this.roleNames[o])
             //   .join(',')
             // return h('div', [h('span', roleNames)])
+            // map（） 遍历数组，并返回新数组，新数组值return中操作后的值
+            // (o) => this.roleNames[o]  等价于 (o) => {return this.roleNames[o]}
+            const roleNames = params.row.roles.map((o) => this.roleNames[o]).join(',')
             return h('div', [
-              h('span', params.row.roles.join(','))
+              h('span', roleNames)
             ])
           },
           search: {
@@ -410,10 +417,27 @@ export default {
           this.$Message.info('取消操作！')
         }
       })
+    },
+    _getRoleNames () {
+      getRoleNames().then((res) => {
+        if (res.code === 200) {
+          this.roles = res.data
+        }
+      })
     }
   },
   mounted () {
     this.getTabList()
+    this._getRoleNames()
+  },
+  computed: {
+    roleNames () {
+      const tmp = {}
+      this.roles.forEach((item) => {
+        tmp[item.role] = item.name
+      })
+      return tmp
+    }
   }
 }
 </script>

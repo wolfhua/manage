@@ -509,3 +509,62 @@ export const getNode = (arr, node) => {
     }
   }
 }
+
+export const modifyNode = (tree, nodes, property, flag) => {
+  for (let i = 0; i < tree.length; i++) {
+    const currrentNode = tree[i]
+    if (nodes && nodes.length > 0) {
+      // 传递了需要设置的节点
+
+      if (nodes.includes(currrentNode._id)) {
+        // console.log(nodes)
+        // console.log(currrentNode._id)
+        const tmp = { ...currrentNode }
+        tmp[property] = flag
+        // 更新树形菜单
+        tree.splice(i, 1, tmp)
+      }
+    } else {
+      // 设置整个树形菜单
+      const tmp = { ...currrentNode }
+      tmp[property] = flag
+      // 更新树形菜单
+      tree.splice(i, 1, tmp)
+    }
+    if (currrentNode.children && currrentNode.children.length > 0) {
+      modifyNode(currrentNode.children, nodes, property, flag)
+    }
+    // 参考http://v4.iviewui.com/components/table
+    if (currrentNode.operations && currrentNode.operations.length > 0) {
+      modifyNode(currrentNode.operations, nodes, '_' + property, flag)
+    }
+  }
+  return tree
+}
+
+// 扁平化数组
+export const flatten = (arr) => {
+  // some 用于检测数组中的元素是否满足指定条件， 如果有一项满足条件都返回true
+  while (arr.some((item) => Array.isArray(item))) {
+    arr = [].concat(...arr)
+  }
+  return arr
+}
+
+// 获取菜单中的id集
+export const getPropertyIds = (menu, properties) => {
+  const arr = []
+  // 遍历整个树形菜单
+  menu.forEach(item => {
+    if (item.checked || item._checked) {
+      arr.push(item._id)
+    }
+    // 查询两个属性下面的节点信息
+    properties.forEach(property => {
+      if (item[property] && item[property].length > 0) {
+        arr.push(getPropertyIds(item[property], properties))
+      }
+    })
+  })
+  return flatten(arr)
+}

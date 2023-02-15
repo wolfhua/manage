@@ -32,7 +32,7 @@
             placeholder="请输入密码"
           ></i-input>
         </FormItem>
-        <!-- <FormItem label="角色" prop="roles">
+        <FormItem label="角色" prop="roles">
           <Select v-model="localItem.roles" multiple>
             <Option
               v-for="(item, index) in roles"
@@ -41,7 +41,7 @@
               >{{ item.name }}</Option
             >
           </Select>
-        </FormItem> -->
+        </FormItem>
         <FormItem label="是否禁用">
           <RadioGroup v-model="localItem.status">
             <Radio label="0">否</Radio>
@@ -89,6 +89,10 @@ export default {
     item: {
       type: Object,
       default: () => { }
+    },
+    roles: {
+      type: Array,
+      default: () => []
     }
   },
   watch: {
@@ -145,6 +149,7 @@ export default {
           { type: 'email', message: '请检查邮箱格式', trigger: 'blur' },
           { validator: userNamePassCheck.bind(this), trigger: 'blur' }
         ],
+        roles: [{ required: true, message: '请选择用户角色', trigger: 'blur' }],
         password: [
           // { required: true, message: '请输入密码', trigger: 'blur' },
           { type: 'string', min: 6, message: '密码长度至少为6位', trigger: 'change' },

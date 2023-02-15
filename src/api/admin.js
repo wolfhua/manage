@@ -26,6 +26,16 @@ const deleteMenu = (data) => axios.post('/admin/delete-menu', data)
 const updateMenu = (data) => axios.post('/admin/update-menu', data)
 // 查询菜单
 const getMenu = () => axios.get('/admin/get-menu')
+// 添加角色
+const addRole = (data) => axios.post('/admin/add-role', data)
+// 删除角色
+const deleteRole = (data) => axios.post('/admin/delete-role', data)
+// 修改角色
+const updateRole = (data) => axios.post('/admin/update-role', data)
+// 查询角色
+const getRoles = () => axios.get('/admin/get-roles')
+// 查询角色名称列表
+const getRoleNames = () => axios.get('/admin/get-roles-names')
 
 export {
   getUserList,
@@ -37,5 +47,10 @@ export {
   addMenu,
   deleteMenu,
   updateMenu,
-  getMenu
+  getMenu,
+  addRole,
+  deleteRole,
+  updateRole,
+  getRoles,
+  getRoleNames
 }
