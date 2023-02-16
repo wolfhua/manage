@@ -7,7 +7,7 @@
       :rules="formRules"
       :label-width="80"
     >
-      <FormItem label="菜单标题" prop="name">
+      <FormItem label="菜单标题" prop="title">
         <Input v-model="formData.title" placeholder="请输入菜单名称"></Input>
       </FormItem>
       <FormItem label="路径" prop="path">
@@ -17,34 +17,50 @@
         <Select v-model="formData.type" placeholder="请选择菜单类型">
           <Option value="menu">目录</Option>
           <Option value="resouce">资源</Option>
+          <Option value="link">链接</Option>
         </Select>
       </FormItem>
-      <FormItem label="组件" prop="component">
-        <i-input v-model="formData.component" placeholder="请输入前端组件名称">
-          <span slot="prepend">()=>import('@/view</span>
-          <span slot="append">.vue')</span>
-        </i-input>
-      </FormItem>
+      <template v-if="formData.type !== 'link'">
+        <FormItem label="组件名称" prop="name">
+          <i-input
+            v-model="formData.name"
+            placeholder="请输入组件名称"
+          ></i-input>
+        </FormItem>
+        <FormItem label="组件">
+          <i-input
+            v-model="formData.component"
+            placeholder="请输入前端组件名称"
+          >
+            <span slot="prepend">()=>import('@</span>
+            <span slot="append">.vue')</span>
+          </i-input>
+        </FormItem>
+        <FormItem label="面包屑">
+          不显示
+          <Switch v-model="formData.hideInBread" />显示
+        </FormItem>
+        <FormItem label="菜单显示">
+          不显示
+          <Switch v-model="formData.hideInMenu" />显示
+        </FormItem>
+        <FormItem label="页面缓存">
+          是
+          <!-- Method 1 -->
+          <!-- <i-switch v-model="formData.notCache"></i-switch> -->
+          <Switch v-model="formData.notCache" />否
+        </FormItem>
+      </template>
+      <template v-else>
+        <FormItem label="链接">
+          <i-input
+            v-model="formData.link"
+            placeholder="请输入跳转链接"
+          ></i-input>
+        </FormItem>
+      </template>
       <FormItem label="排序">
         <i-input v-model="formData.sort" placeholder="组件默认排序"></i-input>
-      </FormItem>
-      <FormItem label="面包屑">
-        不显示
-        <Switch v-model="formData.hideInBread" />
-        显示
-      </FormItem>
-      <FormItem label="菜单显示">
-        不显示
-        <Switch v-model="formData.hideInMenu" />
-        显示
-      </FormItem>
-      <FormItem label="页面缓存">
-        是
-        <!-- Method 1 -->
-        <!-- <i-switch v-model="formData.notCache"></i-switch> -->
-        <!-- Method 2 引入iview-loader -->
-        <Switch v-model="formData.notCache" />
-        否
       </FormItem>
       <FormItem label="图标">
         <i-input v-model="formData.icon" placeholder="请输入图标"></i-input>
@@ -80,6 +96,13 @@ export default {
           {
             required: true,
             message: '菜单名称不得为空',
+            trigger: 'blur'
+          }
+        ],
+        name: [
+          {
+            required: true,
+            message: '组件名称不得为空',
             trigger: 'blur'
           }
         ],

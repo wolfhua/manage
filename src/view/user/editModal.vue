@@ -79,6 +79,14 @@ const favPassCheck = (rule, value, callback) => {
   }
 }
 
+const rolesCheck = (rule, value, callback) => {
+  if (value.length === 0) {
+    callback(new Error('请选择用户角色!'))
+  } else {
+    callback()
+  }
+}
+
 export default {
   name: 'content_edit-modal',
   props: {
@@ -149,7 +157,7 @@ export default {
           { type: 'email', message: '请检查邮箱格式', trigger: 'blur' },
           { validator: userNamePassCheck.bind(this), trigger: 'blur' }
         ],
-        roles: [{ required: true, message: '请选择用户角色', trigger: 'blur' }],
+        roles: [{ validator: rolesCheck, trigger: 'blur' }],
         password: [
           // { required: true, message: '请输入密码', trigger: 'blur' },
           { type: 'string', min: 6, message: '密码长度至少为6位', trigger: 'change' },

@@ -512,31 +512,27 @@ export const getNode = (arr, node) => {
 
 export const modifyNode = (tree, nodes, property, flag) => {
   for (let i = 0; i < tree.length; i++) {
-    const currrentNode = tree[i]
+    // 遍历整个树
+    const currentNode = tree[i]
     if (nodes && nodes.length > 0) {
-      // 传递了需要设置的节点
-
-      if (nodes.includes(currrentNode._id)) {
-        // console.log(nodes)
-        // console.log(currrentNode._id)
-        const tmp = { ...currrentNode }
+      // 传递了需要设置的节点（权限 ）
+      if (nodes.includes(currentNode._id)) {
+        const tmp = { ...currentNode }
         tmp[property] = flag
-        // 更新树形菜单
         tree.splice(i, 1, tmp)
       }
     } else {
-      // 设置整个树形菜单
-      const tmp = { ...currrentNode }
+      // 无节点，无需要特别设置的节点权限，统一去设置整个树形菜单
+      const tmp = { ...currentNode }
       tmp[property] = flag
-      // 更新树形菜单
       tree.splice(i, 1, tmp)
     }
-    if (currrentNode.children && currrentNode.children.length > 0) {
-      modifyNode(currrentNode.children, nodes, property, flag)
+    if (currentNode.children && currentNode.children.length > 0) {
+      modifyNode(currentNode.children, nodes, property, flag)
     }
-    // 参考http://v4.iviewui.com/components/table
-    if (currrentNode.operations && currrentNode.operations.length > 0) {
-      modifyNode(currrentNode.operations, nodes, '_' + property, flag)
+    // _checked 或者 _selected 参考：https://www.iviewui.com/components/table 说明
+    if (currentNode.operations && currentNode.operations.length > 0) {
+      modifyNode(currentNode.operations, nodes, '_' + property, flag)
     }
   }
   return tree
@@ -567,4 +563,15 @@ export const getPropertyIds = (menu, properties) => {
     })
   })
   return flatten(arr)
+}
+
+export const sortMenus = (tree) => {
+  tree = sortObj(tree, 'sort')
+  if (tree.children && tree.children.length > 0) {
+    tree.children = sortMenus(tree.children, 'sort')
+  }
+  if (tree.operations && tree.operations.length > 0) {
+    tree.operations = sortMenus(tree.operations, 'sort')
+  }
+  return tree
 }

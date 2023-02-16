@@ -301,13 +301,16 @@ export default {
     selectRole (index) {
       if (this.roleIndex === '' || this.roleIndex !== index) {
         this.roleIndex = index
+        modifyNode(this.menuData, null, 'checked', false)
+        this.tableData = []
+        // this.roleIndex = ''
         if (this.roles[this.roleIndex].menu.length === 0) {
           return
         }
         // 修改右侧菜单树 + 资源选项的选中状态
         // console.log(this.roles[this.roleIndex].menu)
         const tmpData = modifyNode(this.menuData, this.roles[this.roleIndex].menu, 'checked', true)
-        console.log('🚀 ~ file: index.vue:310 ~ selectRole ~ tmpData', tmpData)
+        // console.log('🚀 ~ file: index.vue:310 ~ selectRole ~ tmpData', tmpData)
         localStorage.setItem('menuData', JSON.stringify(tmpData))
         if (this.selectNode.length > 0 && this.selectNode[0].operations) {
           this.tableData = this.selectNode[0].operations

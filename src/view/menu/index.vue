@@ -51,7 +51,7 @@
 import TreeMenu from './tree.vue'
 import MenuForm from './form.vue'
 import OperationsTable from './operations.vue'
-import { sortObj, deleteNode, insertNode, updateNode, getNode } from '@/libs/util'
+import { sortObj, deleteNode, insertNode, updateNode, getNode, sortMenus } from '@/libs/util'
 import { addMenu, getMenu, updateMenu, deleteMenu } from '@/api/admin'
 export default {
   name: 'admin-menu',
@@ -68,6 +68,7 @@ export default {
       menuData: [],
       formData: {
         title: '',
+        name: '', // 组件名称
         path: '',
         component: '',
         hideInBread: false,
@@ -77,6 +78,7 @@ export default {
         sort: 0,
         redirect: '',
         type: 'menu',
+        link: '',
         operations: []
       },
       columns: [
@@ -225,6 +227,7 @@ export default {
       this.isEdit = false
       this.formData = {
         title: '',
+        name: '', // 组件名称
         path: '',
         component: '',
         hideInBread: false,
@@ -232,6 +235,7 @@ export default {
         notCache: false,
         icon: '',
         sort: 0,
+        link: '',
         redirect: '',
         type: 'menu',
         operations: []
@@ -250,17 +254,20 @@ export default {
       if (this.menuType === 'bro') {
         // 兄弟节点
         if (this.menuData.length === 0) {
-          this.menuData.push(data)
           addMenu(data).then(res => {
             if (res.code === 200) {
+              this.menuData.push(res.data)
               this.$Message.success('菜单添加成功！')
+              // 排序
+              this.menuData = sortMenus([...this.menuData])
+              this.initForm()
             } else {
               this.$Message.error('菜单添加失败！')
             }
           })
         } else {
           const selectNode = this.selectNode[0]
-          this.menuData = insertNode(this.menuData, selectNode, data)
+          //
           // 两种情况
           const parent = getNode(this.menuData, selectNode)
           // console.warn(parent)
@@ -270,6 +277,8 @@ export default {
             // nodekey是iview tree产生的唯一属性
             addMenu(data).then(res => {
               if (res.code === 200) {
+                this.menuData = insertNode(this.menuData, selectNode, res.data)
+                this.menuData = sortMenus([...this.menuData])
                 this.$Message.success('菜单添加成功！')
               } else {
                 this.$Message.error('菜单添加失败！')
@@ -280,6 +289,7 @@ export default {
             // parent = getNode(this.menuData, selectNode)
             updateMenu(parent).then(res => {
               if (res.code === 200) {
+                this.menuData = sortMenus([...this.menuData])
                 this.$Message.success('菜单添加成功！')
               } else {
                 this.$Message.error('菜单添加失败！')
@@ -305,6 +315,7 @@ export default {
         const parent = getNode(this.menuData, this.selectNode[0])
         updateMenu(parent).then(res => {
           if (res.code === 200) {
+            this.menuData = sortMenus([...this.menuData])
             this.$Message.success('子菜单添加成功！')
           } else {
             this.$Message.error('子菜单添加失败！')
@@ -317,6 +328,7 @@ export default {
         const parent = getNode(this.menuData, this.selectNode[0])
         updateMenu(parent).then(res => {
           if (res.code === 200) {
+            this.menuData = sortMenus([...this.menuData])
             this.$Message.success('菜单修改成功！')
           } else {
             this.$Message.error('菜单修改失败！')
