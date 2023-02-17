@@ -12,7 +12,8 @@ export default {
   props: {
     value: Array,
     text: String,
-    subtext: String
+    subtext: String,
+    tipname: String
   },
   data () {
     return {
@@ -48,6 +49,7 @@ export default {
             radius: '55%',
             center: ['50%', '60%'],
             data: this.value,
+            name: this.tipname, // 替换上面formatter的{a}
             itemStyle: {
               emphasis: {
                 shadowBlur: 10,

@@ -155,12 +155,14 @@ export const getExplorer = () => {
  */
 export const on = (function () {
   if (document.addEventListener) {
+    // 如果支持addEventListener绑定事件，如谷歌等现代浏览器
     return function (element, event, handler) {
       if (element && event && handler) {
         element.addEventListener(event, handler, false)
       }
     }
   } else {
+    // IE~
     return function (element, event, handler) {
       if (element && event && handler) {
         element.attachEvent('on' + event, handler)

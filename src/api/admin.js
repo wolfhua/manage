@@ -36,6 +36,8 @@ const updateRole = (data) => axios.post('/admin/update-role', data)
 const getRoles = () => axios.get('/admin/get-roles')
 // 查询角色名称列表
 const getRoleNames = () => axios.get('/admin/get-roles-names')
+// 查询首页统计数据
+const getStatData = () => axios.get('/admin/getStats')
 
 export {
   getUserList,
@@ -52,5 +54,6 @@ export {
   deleteRole,
   updateRole,
   getRoles,
-  getRoleNames
+  getRoleNames,
+  getStatData
 }

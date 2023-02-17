@@ -52,6 +52,7 @@ export default {
     })
   },
   beforeDestroy () {
+    // 组件销毁前，注销绑定事件
     off(window, 'resize', this.resize)
   }
 }
