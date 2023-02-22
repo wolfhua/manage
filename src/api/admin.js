@@ -38,6 +38,10 @@ const getRoles = () => axios.get('/admin/get-roles')
 const getRoleNames = () => axios.get('/admin/get-roles-names')
 // 查询首页统计数据
 const getStatData = () => axios.get('/admin/getStats')
+// 获取日志列表
+const getErrorList = (params) => axios.get('/admin/get-error?' + qs.stringify(params))
+// 删除日志
+const deleteErrors = (data) => axios.post('/admin/delete-error', data)
 
 export {
   getUserList,
@@ -55,5 +59,7 @@ export {
   updateRole,
   getRoles,
   getRoleNames,
-  getStatData
+  getStatData,
+  getErrorList,
+  deleteErrors
 }
