@@ -1,5 +1,5 @@
 # build stage
-FROM node:16 as build-stage
+FROM node:12 as build-stage
 
 LABEL maintainer=18011468389@163.com
 
@@ -8,9 +8,9 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm install cnpm -g --no-progress --registry=https://registry.npm.taobao.org \
-  && cnpm install --no-progress \
-  && npm run build
+RUN yarn install --registry=https://registry.npm.taobao.org
+
+RUN npm run build
 
 # production stage
 FROM nginx:stable-alpine as production-stage
