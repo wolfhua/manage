@@ -94,10 +94,8 @@ export default {
             commit('setUserId', data._id)
             commit('setAccess', data.roles)
             commit('setHasGetInfo', true)
-            resolve(true)
-          } else {
-            resolve(res)
           }
+          resolve(res)
         }).catch(err => {
           reject(err)
         })

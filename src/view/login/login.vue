@@ -7,8 +7,11 @@
     <div class="login-con">
       <Card icon="log-in" title="欢迎登录" :bordered="false">
         <div class="form-con">
-          <login-form @on-success-valid="handleSubmit"></login-form>
-          <!-- <p class="login-tip">输入任意用户名和密码即可</p> -->
+          <login-form
+            :loading="loading"
+            @on-success-valid="handleSubmit"
+          ></login-form>
+          <p class="login-tip">欢迎来到思慕社区</p>
         </div>
       </Card>
     </div>
@@ -22,23 +25,29 @@ export default {
   components: {
     LoginForm
   },
+  data () {
+    return {
+      loading: false
+    }
+  },
   methods: {
     ...mapActions([
       'handleLogin',
       'getUserInfo'
     ]),
     handleSubmit (options) {
+      this.loading = true
       this.handleLogin(options).then(res => {
-        console.log(res)
-        if (res === true) {
+        // console.log(res)
+        this.loading = false
+        if (res.code === 200) {
           this.$router.push({
             name: this.$config.homeName
           })
         } else {
-          this.$Message.info({
-            content: res.msg
-          })
+          this.$Message.error(res.msg)
         }
+
         // this.getUserInfo().then(res => {
         //   this.$router.push({
         //     name: this.$config.homeName
